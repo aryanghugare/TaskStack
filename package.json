@@ -1,0 +1,27 @@
+{
+  "name": "project-management",
+  "version": "1.0.0",
+  "description": "A project management platform",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aryanghugare/TaskStack.git"
+  },
+  "keywords": [
+    "backend",
+    "API"
+  ],
+  "author": "Aryan Ghugare",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aryanghugare/TaskStack/issues"
+  },
+  "homepage": "https://github.com/aryanghugare/TaskStack#readme",
+  "devDependencies": {
+    "prettier": "3.6.2"
+  }
+}
