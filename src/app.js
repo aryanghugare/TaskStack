@@ -18,6 +18,12 @@ methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
 allowedHeaders: ['Content-Type', 'Authorization']
 }))
 
+// import the routes
+// This is done after all the configurations
+import healthcheckRoutes from "./routes/healthcheck.routes.js"
+
+app.use("/api/v1/healthcheck", healthcheckRoutes)
+
 app.get('/', (req, res) => {
   res.send('Hello World!')
 })
