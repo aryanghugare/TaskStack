@@ -1,7 +1,7 @@
 class ApiError extends Error {
 constructor(
+ statusCode, // Keep the order of parameters same in every project
 message="Something went wrong",
- statusCode,
 errors=[],
 stack = ""
 ) 
