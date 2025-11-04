@@ -29,5 +29,23 @@ body("fullName")
 }
 
 
-export {userRegisterValidator
+const userLoginValidator = ()=> {
+return [
+body("email")
+.optional()
+.isEmail().withMessage("Please provide a valid email address"),
+
+body("password")
+.trim()
+.notEmpty().withMessage("Password is required"),
+
+body("username")
+.optional()
+.trim()
+.isLowercase().withMessage("Username must be in lowercase")
+.isLength({min:3, max:30}).withMessage("Username must be between 3 and 30 characters long"),
+]
 }
+
+
+export {userRegisterValidator , userLoginValidator }

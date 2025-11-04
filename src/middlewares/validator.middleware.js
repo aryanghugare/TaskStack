@@ -3,7 +3,7 @@
 // This file is reusable across different routes where validation is needed and also many other projects 
 
 import { validationResult } from "express-validator";
-import { ApiError, AppError } from "../utils/api-error.js"
+import { ApiError } from "../utils/api-error.js"
 
 export const validate = (req, res, next) => {
 const errors = validationResult(req);

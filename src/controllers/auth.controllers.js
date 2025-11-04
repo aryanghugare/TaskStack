@@ -80,5 +80,49 @@ new ApiResponse(
 
 })
 
+const login = asyncHandler(async(req, res) => {
+const {email, password,username} = req.body;
+if(!username && !email){
+throw new ApiError(400, "Please provide username or email to login")
+}
 
-export {registerUser}
+const user = await User.findOne({
+username : username ,
+email : email 
+})
+if(!user){
+throw new ApiError(401, "User does not exist. Please register first.")
+}
+
+const isPasswordValid = await user.isPasswordCorrect(password);
+if(!isPasswordValid){
+    throw new ApiError(401, "Password is not correct . Please try again.")
+}
+
+const {refreshToken , accessToken} = await generateAccessAndRefreshTokens(user._id) 
+
+const loggedInUser =  await User.findById(user._id).select('-password -refreshToken -emailVerificationToken -emailVerificationExpiry');
+
+const options = {
+httpOnly : true,
+secure : true ,
+}
+
+return res.status(200)
+.cookie("refreshToken", refreshToken, options)
+.cookie("accessToken", accessToken, options)
+.json(
+new ApiResponse(
+200,
+{user : loggedInUser, accessToken, refreshToken},
+"User logged in successfully."
+)
+)
+
+
+
+
+})
+
+
+export {registerUser,login}

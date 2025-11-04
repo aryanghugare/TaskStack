@@ -1,6 +1,7 @@
 import express from 'express'
 const app = express()
 import cors from 'cors'
+import cookieParser from 'cookie-parser'
 
 
 
@@ -17,6 +18,7 @@ credentials: true,
 methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
 allowedHeaders: ['Content-Type', 'Authorization']
 }))
+app.use(cookieParser()) // To parse cookies from incoming requests
 
 // import the routes
 // This is done after all the configurations
