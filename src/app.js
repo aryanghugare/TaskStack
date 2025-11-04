@@ -20,9 +20,11 @@ allowedHeaders: ['Content-Type', 'Authorization']
 
 // import the routes
 // This is done after all the configurations
-import healthcheckRoutes from "./routes/healthcheck.routes.js"
+import healthcheckRouter from "./routes/healthcheck.routes.js"
+import authRouter from "./routes/auth.routes.js"
 
-app.use("/api/v1/healthcheck", healthcheckRoutes)
+app.use("/api/v1/healthcheck", healthcheckRouter)
+app.use("/api/v1/auth", authRouter)
 
 app.get('/', (req, res) => {
   res.send('Hello World!')
