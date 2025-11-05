@@ -47,5 +47,39 @@ body("username")
 ]
 }
 
+// Here we can write the validator for changeCurrentPassword too
+// but i have already validated the current password and new password in the controller itself
+/*
+const userChangeCurrentPasswordValidator = () => {
+  return [
+    body("currentPassword").notEmpty().withMessage("current Password is required"),
+    body("newPassword").notEmpty().withMessage("New password is required"),
+  ];
+};
 
-export {userRegisterValidator , userLoginValidator }
+*/
+
+ 
+const userForgotPasswordValidator = () => {
+  return [
+    body("email")
+      .notEmpty()
+      .withMessage("Email is required")
+      .isEmail()
+      .withMessage("Email is invalid"),
+  ];
+};
+
+
+const userResetForgotPasswordValidator = () => {
+  return [body("newPassword").notEmpty().withMessage("Password is required")];
+};
+
+
+
+
+
+
+
+
+export {userRegisterValidator , userLoginValidator ,userForgotPasswordValidator,userResetForgotPasswordValidator}
