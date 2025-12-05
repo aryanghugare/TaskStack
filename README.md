@@ -110,7 +110,7 @@ curl -X POST "https://api.taskstack.app/api/v1/tasks" \
 Getting Started
 ---------------
 Prerequisites
-- Node >= 18 / Python 3.10 / Go 1.20 (depending on chosen stack) — adjust to repo stack.
+- Node >= 18 
 - PostgreSQL >= 13
 - Redis
 - Message broker (RabbitMQ / Kafka) for background jobs
@@ -119,7 +119,7 @@ Prerequisites
 Quick start (example for a Node/Express setup)
 ```bash
 # clone
-git clone https://github.com/<owner>/TaskStack.git
+git clone https://github.com/aryanghugare/TaskStack.git
 cd TaskStack
 
 # copy env
@@ -136,79 +136,6 @@ npm run migrate
 npm run dev
 ```
 
-Environment variables
-- DATABASE_URL=postgres://user:pass@localhost:5432/taskstack
-- REDIS_URL=redis://localhost:6379
-- JWT_SECRET=super-secret-key
-- PORT=4000
-- ELASTICSEARCH_URL=http://localhost:9200
-
-Run tests
-```bash
-# unit & integration tests
-npm test
-
-# run linters & type checks
-npm run lint
-npm run typecheck
-```
-
-Development & Contributing
---------------------------
-We welcome contributions. Suggested workflow:
-- Open an issue describing the enhancement / bug.
-- Create a branch feature/<short-desc> or fix/<short-desc>.
-- Add tests for new behavior and ensure all tests pass.
-- Open a pull request with a clear description & related issue link.
-
-Please follow:
-- Commit message convention: feat|fix|chore(scope): short summary
-- Code style: follow ESLint / Prettier rules used in the repo
-- Tests: aim for meaningful unit & integration coverage
-
-Testing & API Contract
-----------------------
-I will add a comprehensive Postman collection and exported environment that covers:
-- Authentication flows (login, token refresh)
-- CRUD for tasks, comments, subtasks
-- Webhook lifecycle & retry semantics
-- Role-based access & permission edge cases
-- Performance smoke tests for bulk operations
-
-When you provide the Postman exports, I will integrate them into the repository (e.g., in /postman) and add CI validations that run Newman (Postman CLI) against a staging stack in CI.
-
-Deployment & Scaling
---------------------
-- Containerized with Docker; multi-stage builds for slim images.
-- Use Kubernetes for horizontal scaling; set up HPA on CPU/memory or request rate.
-- Database: primary + read replicas, use connection pooling.
-- Caching: Redis for hot data & distributed locks (e.g., to handle task claim races).
-- Workers: autoscaling consumer group for background jobs.
-- Use blue-green or canary deployments for zero-downtime releases.
-
-Security & Best Practices
--------------------------
-- Validate & sanitize all inputs; prefer parameterized queries or ORM.
-- Rate-limit public endpoints and protect write routes with CSRF-safe patterns where applicable.
-- Audit events for sensitive changes (status change, assignee change, permission updates).
-- Rotate secrets regularly; use Vault / secret manager for production.
-- Use HTTPS everywhere; set strict CORS and CSP policies for any frontend assets.
-
-Observability
--------------
-- Structured logs (JSON) with request IDs.
-- Metrics via Prometheus + Grafana (request latency, error rates, queue depth).
-- Distributed tracing (OpenTelemetry) to trace requests through API -> workers -> downstream services.
-- Alerts for service errors, high latency, queue backlog & DB connection exhaustion.
-
-Roadmap
--------
-Planned high-value items:
-- Full Postman collection & CI integration (Newman).
-- GraphQL layer for efficient client queries.
-- Multi-tenant support with strict isolation.
-- SSO (SAML & enterprise OAuth providers).
-- Mobile SDKs & webhooks marketplace for easy integrations.
 
 License
 -------
@@ -217,7 +144,7 @@ This project is MIT licensed — see the LICENSE file for details.
 Contact
 -------
 Maintainer: @aryanghugare
-Project: TaskStack — https://github.com/<owner>/TaskStack
+Project: TaskStack — https://github.com/aryanghugare/TaskStack
 
 Appendix: Useful patterns & conventions
 - Error body:
