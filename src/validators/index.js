@@ -1,4 +1,5 @@
 import { body } from "express-validator";
+import { AvailableUserRole } from "../utils/constants.js";
 
 
 // The user registration validator
@@ -83,3 +84,50 @@ const userResetForgotPasswordValidator = () => {
 
 
 export {userRegisterValidator , userLoginValidator ,userForgotPasswordValidator,userResetForgotPasswordValidator}
+
+
+// Project validators
+const createProjectValidator = () => {
+  return [
+    body("name")
+      .trim()
+      .notEmpty()
+      .withMessage("Project name is required")
+      .isLength({ min: 2, max: 120 })
+      .withMessage("Project name must be between 2 and 120 characters"),
+    body("description").optional().trim().isLength({ max: 2000 }).withMessage("Description is too long"),
+  ];
+};
+
+const addMembertoProjectValidator = () => {
+  return [
+    body().custom((value, { req }) => {
+      const hasUserId = Boolean(req.body?.userId);
+      const hasMembersArray = Array.isArray(req.body?.members);
+      if (!hasUserId && !hasMembersArray) {
+        throw new Error("userId or members array is required");
+      }
+      return true;
+    }),
+
+    // single member payload
+    body("userId").optional().isMongoId().withMessage("Invalid userId"),
+    body("role")
+      .optional()
+      .isIn(AvailableUserRole)
+      .withMessage("Invalid role"),
+
+    // multiple members payload
+    body("members").optional().isArray({ min: 1 }).withMessage("members must be an array"),
+    body("members.*.userId")
+      .optional()
+      .isMongoId()
+      .withMessage("Invalid userId in members"),
+    body("members.*.role")
+      .optional()
+      .isIn(AvailableUserRole)
+      .withMessage("Invalid role in members"),
+  ];
+};
+
+export { createProjectValidator, addMembertoProjectValidator };

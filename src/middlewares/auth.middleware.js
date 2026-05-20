@@ -2,6 +2,7 @@
 // If it is missing or invalid, we need to block the access
 // This file will be used in many projects 
 import {User} from '../models/user.models.js'
+import {ProjectMember} from '../models/projectmember.models.js'
 import {ApiError} from '../utils/api-error.js'
 import {asyncHandler} from '../utils/async-handler.js'
 import jwt from 'jsonwebtoken'
@@ -31,4 +32,35 @@ throw new ApiError(491,error?.message || "Invalid access token")
 
 
 })
+
+
+// Validate that the current user is a member of the project and optionally
+// that they have one of the allowed roles for that project.
+export const validateProjectPermission = (allowedRoles = []) => {
+	return asyncHandler(async (req, res, next) => {
+		const { projectId } = req.params;
+
+		if (!projectId) {
+			throw new ApiError(400, "Project id is missing")
+		}
+
+		const membership = await ProjectMember.findOne({
+			project: projectId,
+			user: req.user?._id,
+		});
+
+		if (!membership) {
+			throw new ApiError(403, "You are not a member of this project")
+		}
+
+		if (Array.isArray(allowedRoles) && allowedRoles.length > 0) {
+			if (!allowedRoles.includes(membership.role)) {
+				throw new ApiError(403, "You do not have permission to perform this action")
+			}
+		}
+
+		req.projectMember = membership;
+		next();
+	})
+}
 
