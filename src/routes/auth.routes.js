@@ -16,7 +16,7 @@ const router = Router();
 // userRegisterValidator is the function that returns an array of validation rules
 router.route("/register").post(userRegisterValidator() ,validate,registerUser); // Here the thing is we are adding the validator middleware to the route before the controller function
 router.route("/login").post(userLoginValidator() ,validate,login);
-router.route("verify-email/:verificationToken").get(emailVerification);
+router.route("/verify-email/:verificationToken").get(emailVerification);
 router.route("/refresh-token").post(refreshAccessToken);
 router.route("/forgot-password").post(userForgotPasswordValidator(),validate,forgotPassword);
 router.route("/reset-password/:resetToken").post(userResetForgotPasswordValidator(),validate,resetForgotPassword)

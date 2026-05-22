@@ -1,103 +1,138 @@
 # TaskStack
 
-TaskStack is a robust backend platform for project and task management, built with Node.js, Express, and MongoDB. It provides secure user authentication, project and team management, and a scalable REST API for collaborative work.
-
----
+TaskStack is a Node.js + Express + MongoDB backend for project management. It includes JWT auth (access + refresh), email verification, password reset, and role-based project membership.
 
 ## Features
 
-- User registration, login, JWT authentication, and email verification
-- Password reset with secure token handling
-- Project CRUD operations
-- Team and member management with role-based access (admin/member)
--  Task management within projects
-- Email notifications for verification and password reset
-- Modular, extensible codebase
+- JWT authentication (access + refresh tokens)
+- Email verification + resend verification
+- Forgot-password flow with time-limited reset tokens
+- Project CRUD with role-based permissions
+- Project member management (add/remove members, change roles)
+- Healthcheck endpoint
 
----
+## Tech Stack
+
+- Node.js, Express (ESM)
+- MongoDB + Mongoose
+- Auth: JWT + bcrypt
+- Email: Nodemailer + Mailgen (Mailtrap SMTP)
+- Validation: express-validator
 
 ## Project Structure
 
 ```
 /Project-Management
-├── src
-│   ├── config/          # App and database configuration
-│   ├── controllers/     # Route handlers (auth, project, user, etc.)
-│   ├── middleware/      # Authentication, validation, error handling
-│   ├── models/          # Mongoose schemas (User, Project, etc.)
-│   ├── routes/          # Express route definitions
-│   ├── utils/           # Helpers (email, tokens, responses, etc.)
-├── tests/               # Unit and integration tests
-├── .env.example         # Example environment variables
-├── .prettierignore      # Prettier ignore rules
-├── .gitignore           # Git ignore rules
-├── package.json         # NPM scripts and dependencies
-├── README.md            # Project documentation
-└── LICENSE
+├── public/
+│   └── images/
+├── src/
+│   ├── app.js
+│   ├── index.js
+│   ├── controllers/
+│   ├── db/
+│   ├── middlewares/
+│   ├── models/
+│   ├── routes/
+│   ├── utils/
+│   └── validators/
+├── .env
+├── package.json
+└── README.md
 ```
 
----
+## Setup
 
-## Tech Stack
+### 1) Install
 
-- **Backend:** Node.js, Express.js
-- **Database:** MongoDB (Mongoose)
-- **Authentication:** JWT, bcrypt, email verification
-- **Email:** Nodemailer, Mailgen
-- **Validation:** Custom middleware and validators
+```bash
+npm install
+```
 
----
+### 2) Environment variables
 
-## API Overview
+Create a `.env` in the project root:
 
-All endpoints are under `/api/v1/`. Authentication is via JWT in the `Authorization` header.
+```bash
+PORT=3000
+MONGO_URI=mongodb://127.0.0.1:27017/taskstack
+
+# Comma-separated list is supported (e.g. http://localhost:5173,http://localhost:3001)
+CORS_ORIGIN=http://localhost:5173
+
+ACCESS_TOKEN_SECRET=your_access_secret
+ACCESS_TOKEN_EXPIRY=1d
+REFRESH_TOKEN_SECRET=your_refresh_secret
+REFRESH_TOKEN_EXPIRY=7d
+
+# Mailtrap SMTP
+MAILTRAP_SMTP_HOST=smtp.mailtrap.io
+MAILTRAP_SMTP_PORT=2525
+MAILTRAP_SMTP_USER=...
+MAILTRAP_SMTP_PASSWORD=...
+
+# Where your frontend resets the password (the API appends /:token)
+FORGOT_PASSWORD_REDIRECT_URL=http://localhost:5173/reset-password
+```
+
+Notes:
+
+- Auth cookies are set as `httpOnly` and `secure`. If you are developing on plain HTTP, the browser may not store `accessToken`/`refreshToken` cookies.
+
+### 3) Run
+
+```bash
+npm run dev
+```
+
+## API
+
+Base path: `/api/v1`
+
+Authentication:
+
+- Send `Authorization: Bearer <accessToken>` OR rely on the `accessToken` cookie.
+
+### Healthcheck
+
+- `GET /api/v1/healthcheck` — Service health
 
 ### Auth
 
-- `POST /api/v1/auth/register` — Register a new user
-- `POST /api/v1/auth/login` — Login and receive tokens
-- `POST /api/v1/auth/logout` — Logout and clear tokens
-- `POST /api/v1/auth/refresh-token` — Refresh access token
-- `GET /api/v1/users/verify-email/:verificationToken` — Email verification
-- `POST /api/v1/auth/forgot-password` — Request password reset
-- `POST /api/v1/auth/reset-password/:resetToken` — Reset password
-
-### Users
-
-- `GET /api/v1/users/me` — Get current user profile
+- `POST /api/v1/auth/register` — Register user (sends verification email)
+- `POST /api/v1/auth/login` — Login (sets `accessToken` and `refreshToken` cookies)
+- `POST /api/v1/auth/refresh-token` — Refresh tokens
+- `POST /api/v1/auth/logout` — Logout (requires auth)
+- `GET /api/v1/auth/current-user` — Get current user (requires auth)
+- `POST /api/v1/auth/change-password` — Change password (requires auth)
+- `POST /api/v1/auth/forgot-password` — Request password reset email
+- `POST /api/v1/auth/reset-password/:resetToken` — Reset forgotten password
+- `GET /api/v1/auth/verify-email/:verificationToken` — Verify email
+- `POST /api/v1/auth/resend-email-verification` — Resend verification email (requires auth)
 
 ### Projects
 
-- `GET /api/v1/projects` — List all projects for the user
-- `POST /api/v1/projects` — Create a new project
-- `GET /api/v1/projects/:projectId` — Get project details
+All project routes require authentication.
+
+- `GET /api/v1/projects` — List projects for current user
+- `POST /api/v1/projects` — Create project
+- `GET /api/v1/projects/:projectId` — Get project (must be a member)
 - `PUT /api/v1/projects/:projectId` — Update project (admin only)
 - `DELETE /api/v1/projects/:projectId` — Delete project (admin only)
 
 ### Project Members
 
-- `GET /api/v1/projects/:projectId/members` — List project members
-- `POST /api/v1/projects/:projectId/members` — Add member (admin only)
+- `GET /api/v1/projects/:projectId/members` — List members
+- `POST /api/v1/projects/:projectId/members` — Add members (admin only)
 - `PUT /api/v1/projects/:projectId/members/:userId` — Update member role (admin only)
 - `DELETE /api/v1/projects/:projectId/members/:userId` — Remove member (admin only)
 
-### Tasks
-
-- `GET /api/v1/projects/:projectId/tasks` — List tasks in a project
-- `POST /api/v1/projects/:projectId/tasks` — Create a task
-- `GET /api/v1/projects/:projectId/tasks/:taskId` — Get task details
-- `PATCH /api/v1/projects/:projectId/tasks/:taskId` — Update task
-- `DELETE /api/v1/projects/:projectId/tasks/:taskId` — Delete task
-
----
+Member roles are defined in `src/utils/constants.js` (e.g. `admin`, `project_admin`, `member`).
 
 ## License
 
-MIT — see the [LICENSE](LICENSE) file for details.
-
----
+License is `ISC` (per `package.json`).
 
 ## Contact
 
-Maintainer: [@aryanghugare](https://github.com/aryanghugare)
-Project: [TaskStack](https://github.com/aryanghugare/TaskStack)
+Maintainer: https://github.com/aryanghugare
+Repository: https://github.com/aryanghugare/TaskStack
